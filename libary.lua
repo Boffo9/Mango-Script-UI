@@ -2450,6 +2450,45 @@ function Library:CreateWindow(...)
 
     Library:MakeDraggable(Outer, 25);
 
+    -- Resize handle (bottom-right corner) - 16px, easy to grab
+    local ResizeHandle = Library:Create('Frame', {
+        AnchorPoint = Vector2.new(1, 1);
+        BackgroundColor3 = Library.AccentColor;
+        BorderSizePixel = 0;
+        Position = UDim2.new(1, 0, 1, 0);
+        Size = UDim2.new(0, 16, 0, 16);
+        ZIndex = 300;
+        Parent = Outer;
+    });
+    Library:AddToRegistry(ResizeHandle, { BackgroundColor3 = 'AccentColor' });
+
+    -- Diagonal grip lines inside the handle
+    for i = 1, 3 do
+        Library:Create('Frame', {
+            BackgroundColor3 = Library.MainColor;
+            BorderSizePixel = 0;
+            Position = UDim2.fromOffset(i * 3, 1);
+            Size = UDim2.fromOffset(1, 16 - i * 3);
+            ZIndex = 301;
+            Parent = ResizeHandle;
+        });
+    end
+
+    ResizeHandle.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local StartMouseX = Mouse.X;
+            local StartMouseY = Mouse.Y;
+            local StartSizeX  = Outer.AbsoluteSize.X;
+            local StartSizeY  = Outer.AbsoluteSize.Y;
+            while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
+                local NewX = math.max(450, StartSizeX + (Mouse.X - StartMouseX));
+                local NewY = math.max(300, StartSizeY + (Mouse.Y - StartMouseY));
+                Outer.Size = UDim2.fromOffset(NewX, NewY);
+                RenderStepped:Wait();
+            end;
+        end;
+    end);
+
     local Inner = Library:Create('Frame', {
         BackgroundColor3 = Library.MainColor;
         BorderColor3 = Library.AccentColor;
@@ -2469,7 +2508,7 @@ function Library:CreateWindow(...)
         Position = UDim2.new(0, 7, 0, 0);
         Size = UDim2.new(0, 0, 0, 25);
         RichText = true;
-        Text = '<font color="#E6961E">🥭 Mango</font>  ' .. (Config.Title or '');
+        Text = '<font color="#E6961E">🥭 Mango</font>';
         TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = 1;
         Parent = Inner;
@@ -2545,7 +2584,7 @@ function Library:CreateWindow(...)
     });
 
     function Window:SetWindowTitle(Title)
-        WindowLabel.Text = '<font color="#E6961E">🥭 Mango</font>  ' .. Title;
+        WindowLabel.Text = '<font color="#E6961E">🥭 Mango</font>';
     end;
 
     function Window:AddTab(Name)
@@ -2614,21 +2653,36 @@ function Library:CreateWindow(...)
             Parent = TabContainer;
         });
 
-        local LeftSide = Library:Create('Frame', {
+        local LeftSide = Library:Create('ScrollingFrame', {
             BackgroundTransparency = 1;
             Position = UDim2.new(0, 8, 0, 8);
-            Size = UDim2.new(0.5, -12, 0, 507);
+            Size = UDim2.new(0.5, -12, 1, -16);
             ZIndex = 2;
+            CanvasSize = UDim2.new(0, 0, 0, 0);
+            AutomaticCanvasSize = Enum.AutomaticSize.Y;
+            ScrollBarThickness = 3;
+            ScrollBarImageColor3 = Library.AccentColor;
+            ScrollingDirection = Enum.ScrollingDirection.Y;
+            BorderSizePixel = 0;
             Parent = TabFrame;
         });
 
-        local RightSide = Library:Create('Frame', {
+        local RightSide = Library:Create('ScrollingFrame', {
             BackgroundTransparency = 1;
             Position = UDim2.new(0.5, 4, 0, 8);
-            Size = UDim2.new(0.5, -12, 0, 507);
+            Size = UDim2.new(0.5, -12, 1, -16);
             ZIndex = 2;
+            CanvasSize = UDim2.new(0, 0, 0, 0);
+            AutomaticCanvasSize = Enum.AutomaticSize.Y;
+            ScrollBarThickness = 3;
+            ScrollBarImageColor3 = Library.AccentColor;
+            ScrollingDirection = Enum.ScrollingDirection.Y;
+            BorderSizePixel = 0;
             Parent = TabFrame;
         });
+
+        Library:AddToRegistry(LeftSide,  { ScrollBarImageColor3 = 'AccentColor' });
+        Library:AddToRegistry(RightSide, { ScrollBarImageColor3 = 'AccentColor' });
 
         Library:Create('UIListLayout', {
             Padding = UDim.new(0, 8);
@@ -2999,28 +3053,6 @@ function Library:CreateWindow(...)
     function Library.Toggle()
         Outer.Visible = not Outer.Visible;
         ModalElement.Modal = Outer.Visible;
-
-        local oIcon = Mouse.Icon;
-        local State = InputService.MouseIconEnabled;
-
-        local Cursor = Drawing.new('Triangle');
-        Cursor.Thickness = 1;
-        Cursor.Filled = true;
-
-        while Outer.Visible do
-            local mPos = Workspace.CurrentCamera:WorldToViewportPoint(Mouse.Hit.p);
-
-            Cursor.Color = Library.AccentColor;
-            Cursor.PointA = Vector2.new(mPos.X, mPos.Y);
-            Cursor.PointB = Vector2.new(mPos.X, mPos.Y) + Vector2.new(6, 14);
-            Cursor.PointC = Vector2.new(mPos.X, mPos.Y) + Vector2.new(-6, 14);
-
-            Cursor.Visible = not InputService.MouseIconEnabled;
-
-            RenderStepped:Wait();
-        end;
-
-        Cursor:Remove();
     end
 
     Library:GiveSignal(InputService.InputBegan:Connect(function(Input, Processed)
