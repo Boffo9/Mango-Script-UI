@@ -28,13 +28,14 @@ local Library = {
 
     HudRegistry = {};
 
-    FontColor = Color3.fromRGB(118, 118, 118);
-    FontColor2 = Color3.fromRGB(198, 198, 198);
-    MainColor = Color3.fromRGB(11, 11, 11);
-    SelectedTabColor = Color3.fromRGB(23, 23, 23);
-    BackgroundColor = Color3.fromRGB(15, 15, 15);
-    AccentColor = Color3.fromRGB(93, 88, 157);
-    OutlineColor = Color3.fromRGB(25, 25, 25);
+    -- Mango Script Branding: Warm amber/orange accent palette
+    FontColor = Color3.fromRGB(160, 140, 110);
+    FontColor2 = Color3.fromRGB(220, 200, 170);
+    MainColor = Color3.fromRGB(10, 8, 6);
+    SelectedTabColor = Color3.fromRGB(22, 18, 12);
+    BackgroundColor = Color3.fromRGB(14, 11, 8);
+    AccentColor = Color3.fromRGB(230, 150, 30);
+    OutlineColor = Color3.fromRGB(40, 30, 18);
 
     Black = Color3.new(0, 0, 0);
 
@@ -2468,7 +2469,7 @@ function Library:CreateWindow(...)
         Position = UDim2.new(0, 7, 0, 0);
         Size = UDim2.new(0, 0, 0, 25);
         RichText = true;
-        Text = Config.Title or '';
+        Text = '<font color="#E6961E">🥭 Mango</font>  ' .. (Config.Title or '');
         TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = 1;
         Parent = Inner;
@@ -2544,7 +2545,7 @@ function Library:CreateWindow(...)
     });
 
     function Window:SetWindowTitle(Title)
-        WindowLabel.Text = Title;
+        WindowLabel.Text = '<font color="#E6961E">🥭 Mango</font>  ' .. Title;
     end;
 
     function Window:AddTab(Name)
